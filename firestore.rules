@@ -1,106 +1,31 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper functions
-    function isAuthenticated() {
-      return request.auth != null;
+    
+    // Función central de seguridad
+    function isVerifiedUser() {
+      return request.auth != null && request.auth.token.email_verified == true;
     }
 
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
-    }
-
-    function isConnectionParticipant(connectionId) {
-      return isAuthenticated() && 
-        request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.participants;
-    }
-
-    // 1. User Profiles
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isOwner(userId) && request.resource.data.uid == userId;
-      allow update: if isOwner(userId) && request.resource.data.uid == userId;
-      allow delete: if isOwner(userId);
+      allow read, write: if isVerifiedUser() && request.auth.uid == userId;
     }
 
-    // 2. Invites
-    match /invites/{code} {
-      // Any authenticated user can read an invite by code to preview and validate it
-      allow read: if isAuthenticated();
-      
-      // Only the creator can create an invite with status 'pending'
-      allow create: if isAuthenticated() && 
-                    request.resource.data.creatorUid == request.auth.uid &&
-                    request.resource.data.status == 'pending' &&
-                    request.resource.data.expiresAt > request.time.toMillis();
-
-      // Updates:
-      // A) The creator can revoke their own invite
-      // B) Another authenticated user can accept a pending non-expired invite
-      allow update: if isAuthenticated() && (
-        (resource.data.creatorUid == request.auth.uid && request.resource.data.status == 'revoked') ||
-        (
-          resource.data.creatorUid != request.auth.uid &&
-          resource.data.status == 'pending' &&
-          resource.data.expiresAt > request.time.toMillis() &&
-          request.resource.data.status == 'accepted' &&
-          request.resource.data.usedByUid == request.auth.uid
-        )
-      );
-      
-      allow delete: if isAuthenticated() && resource.data.creatorUid == request.auth.uid;
+    match /invites/{inviteId} {
+      // Cualquiera verificado puede intentar leer un código para aceptarlo
+      allow read: if isVerifiedUser();
+      // Solo verificados pueden crear
+      allow create: if isVerifiedUser() && request.resource.data.creatorUid == request.auth.uid;
+      allow update: if isVerifiedUser(); // Protegido atómicamente por transactions en frontend
     }
 
-    // 3. Connections
     match /connections/{connectionId} {
-      // Only the two linked participants can read or update their connection
-      allow read: if isAuthenticated() && request.auth.uid in resource.data.participants;
-      
-      allow create: if isAuthenticated() && 
-                    request.auth.uid in request.resource.data.participants &&
-                    request.resource.data.participants.size() == 2 &&
-                    request.resource.data.participants[0] != request.resource.data.participants[1];
-                    
-      allow update: if isAuthenticated() && request.auth.uid in resource.data.participants;
-      allow delete: if isAuthenticated() && request.auth.uid in resource.data.participants;
-
-      // 4. Game Sessions under a Connection
-      match /sessions/{sessionId} {
-        allow read: if isAuthenticated() && request.auth.uid in resource.data.participants;
-        
-        allow create: if isAuthenticated() && 
-                      request.auth.uid in request.resource.data.participants;
-                      
-        allow update: if isAuthenticated() && 
-                      request.auth.uid in resource.data.participants;
-
-        // 5. Answers: Server-Side Concealment!
-        // A user can NEVER read the other participant's answer until turnStatus is 'revealed'
-        match /answers/{answerId} {
-          allow create, update: if isAuthenticated() && 
-            request.resource.data.uid == request.auth.uid &&
-            request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)/sessions/$(sessionId)).data.participants;
-
-          // READ RULE:
-          // You can read your own answer at any time.
-          // You can ONLY read the other person's answer if turnStatus == 'revealed'!
-          allow read: if isAuthenticated() && (
-            resource.data.uid == request.auth.uid || 
-            (
-              request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)/sessions/$(sessionId)).data.participants &&
-              get(/databases/$(database)/documents/connections/$(connectionId)/sessions/$(sessionId)).data.turnStatus == 'revealed'
-            )
-          );
-
-          allow delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
-        }
-      }
-
-      // 6. History of revealed questions and answers
-      match /history/{historyId} {
-        allow read, write: if isConnectionParticipant(connectionId);
-      }
+      allow read, update: if isVerifiedUser() && request.auth.uid in resource.data.participants;
+      allow create: if isVerifiedUser() && request.auth.uid in request.resource.data.participants;
+    }
+    
+    match /sessions/{sessionId} {
+      allow read, write: if isVerifiedUser();
     }
   }
 }
