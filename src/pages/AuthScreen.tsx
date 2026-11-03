@@ -5,20 +5,20 @@ import { UserProfile } from '../types';
 import { Mail, Lock, User, ArrowRight, Sparkles, Heart, Shield, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface AuthScreenProps {
-  onAuthSuccess: (user: UserProfile) => void;
+  onAuthSuccess: (user: any) => void;
 }
 
 type Mode = 'login' | 'register' | 'forgot_password';
 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
   const [mode, setMode] = useState<Mode>('login');
-  
+
   // Form fields
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   // State
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -122,7 +122,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col justify-center items-center px-4 py-8 relative">
-      
+
       {/* Decorative background glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-pink-500/10 dark:bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -132,13 +132,13 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
         {/* Top Header Card */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center p-3 rounded-3xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 shadow-xl shadow-indigo-500/20 mb-4 animate-pulse-subtle">
-            <img 
-              src="/logo.png" 
-              alt="Sintonía logo" 
+            <img
+              src="/logo.png"
+              alt="Sintonía logo"
               className="w-14 h-14 object-cover rounded-2xl"
               onError={(e) => {
                 (e.target as HTMLElement).style.display = 'none';
-              }} 
+              }}
             />
           </div>
 
@@ -164,22 +164,20 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
               <button
                 type="button"
                 onClick={() => { setMode('login'); clearMessages(); }}
-                className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  mode === 'login'
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${mode === 'login'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
               >
                 Iniciar Sesión
               </button>
               <button
                 type="button"
                 onClick={() => { setMode('register'); clearMessages(); }}
-                className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  mode === 'register'
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${mode === 'register'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
               >
                 Crear Cuenta
               </button>

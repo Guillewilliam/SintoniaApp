@@ -1,33 +1,30 @@
 import React, { useState } from 'react';
-import { UserProfile } from '../types';
 import { updateUserProfile, deleteCurrentUserAccount } from '../services/authService';
 import { X, User, Check, ShieldAlert, LogOut } from 'lucide-react';
 
-interface UserProfileModalProps {
-  user: UserProfile;
-  onClose: () => void;
-  onLogout: () => void;
-}
-
-const AVATARS = [
-  { id: 'avatar_1', color: 'from-indigo-500 to-purple-600', emoji: '✨' },
-  { id: 'avatar_2', color: 'from-rose-500 to-pink-600', emoji: '💖' },
-  { id: 'avatar_3', color: 'from-amber-500 to-orange-600', emoji: '🔥' },
-  { id: 'avatar_4', color: 'from-emerald-500 to-teal-600', emoji: '🌿' },
-  { id: 'avatar_5', color: 'from-blue-500 to-cyan-600', emoji: '🌊' },
-  { id: 'avatar_6', color: 'from-purple-500 to-violet-700', emoji: '🔮' }
-];
-
-export const UserProfileModal: React.FC<UserProfileModalProps> = ({
+export const UserProfileModal = ({
   user,
   onClose,
   onLogout
+}: {
+  user?: any;
+  onClose: () => void;
+  onLogout?: () => Promise<void>;
 }) => {
-  const [displayName, setDisplayName] = useState(user.displayName);
-  const [selectedAvatar, setSelectedAvatar] = useState(user.photoURL || 'avatar_1');
+  const [displayName, setDisplayName] = useState(user?.displayName || '');
+  const [selectedAvatar, setSelectedAvatar] = useState(user?.photoURL || 'avatar_1');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const AVATARS = [
+    { id: 'avatar_1', color: 'from-indigo-500 to-purple-600', emoji: '✨' },
+    { id: 'avatar_2', color: 'from-rose-500 to-pink-600', emoji: '💖' },
+    { id: 'avatar_3', color: 'from-amber-500 to-orange-600', emoji: '🔥' },
+    { id: 'avatar_4', color: 'from-emerald-500 to-teal-600', emoji: '🌿' },
+    { id: 'avatar_5', color: 'from-blue-500 to-cyan-600', emoji: '🌊' },
+    { id: 'avatar_6', color: 'from-purple-500 to-violet-700', emoji: '🔮' }
+  ];
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +33,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
     setLoading(true);
     setMessage(null);
     try {
-      await updateUserProfile({
+      await updateUserProfile(user.uid, {
         displayName: displayName.trim(),
         photoURL: selectedAvatar
       });
@@ -63,7 +60,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fadeIn">
       <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 text-slate-800 dark:text-slate-100 shadow-2xl space-y-5 transition-all duration-200">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -87,7 +84,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         )}
 
         <form onSubmit={handleSave} className="space-y-4">
-          
+
           {/* Avatar selector */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
@@ -99,9 +96,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   key={av.id}
                   type="button"
                   onClick={() => setSelectedAvatar(av.id)}
-                  className={`relative w-11 h-11 rounded-full bg-gradient-to-tr ${av.color} flex items-center justify-center text-lg shadow-md transition-all cursor-pointer ${
-                    selectedAvatar === av.id ? 'ring-2 ring-indigo-500 scale-110' : 'opacity-70 hover:opacity-100'
-                  }`}
+                  className={`relative w-11 h-11 rounded-full bg-gradient-to-tr ${av.color} flex items-center justify-center text-lg shadow-md transition-all cursor-pointer ${selectedAvatar === av.id ? 'ring-2 ring-indigo-500 scale-110' : 'opacity-70 hover:opacity-100'
+                    }`}
                 >
                   <span>{av.emoji}</span>
                   {selectedAvatar === av.id && (
@@ -136,11 +132,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             <input
               type="email"
               disabled
-              value={user.email}
+              value={user?.email || ''}
               className="w-full bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-slate-500 text-xs rounded-xl px-4 py-2.5 cursor-not-allowed font-mono"
             />
             <p className="text-[10px] text-slate-400 mt-1">
-              Vinculado de forma única a tu UID: <span className="font-mono">{user.uid.slice(0, 8)}...</span>
+              Vinculado de forma única a tu UID: <span className="font-mono">{user?.uid?.slice(0, 8)}...</span>
             </p>
           </div>
 
@@ -200,7 +196,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

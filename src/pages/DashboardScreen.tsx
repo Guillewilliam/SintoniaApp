@@ -127,7 +127,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
           title: 'Pregunta de Sintonía',
           text
         });
-      } catch {}
+      } catch { }
     } else {
       navigator.clipboard.writeText(text);
       setCopiedShare(true);
@@ -142,9 +142,8 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
   // Subscribe to connections
   useEffect(() => {
-    const unsubscribe = subscribeToUserConnections(user.uid, (conns) => {
+    const unsubscribe = subscribeToUserConnections(user.uid, (conns: any[]) => {
       setConnections(conns);
-      setLoading(false);
     });
 
     return () => {
@@ -195,7 +194,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-7">
-      
+
       {/* Personalized Greeting */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -229,7 +228,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
       {/* 24-HOUR DAILY QUESTION SPARK CARD WITH SELECTABLE CATEGORIES */}
       <div className="relative p-6 sm:p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-200">
-        
+
         {/* Soft atmospheric gradient accent */}
         <div className={`absolute -top-12 -right-12 w-48 h-48 bg-gradient-to-br ${activeCategoryObj.color} opacity-15 rounded-full blur-3xl pointer-events-none`}></div>
 
@@ -276,11 +275,10 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                 <button
                   key={cat.id}
                   onClick={() => setSelectedDailyCat(cat.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex-shrink-0 ${
-                    isSelected
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex-shrink-0 ${isSelected
                       ? `bg-gradient-to-r ${cat.color} text-white shadow-md scale-102`
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700/60'
-                  }`}
+                    }`}
                 >
                   <span className="flex-shrink-0">{CATEGORY_ICONS[cat.id]}</span>
                   <span>{cat.name}</span>
@@ -316,7 +314,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
               <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
               <span>Has respondido a la pregunta de hoy en <strong>{activeCategoryObj.name}</strong></span>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsAnswering(true)}
@@ -451,7 +449,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                   className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 shadow-md hover:shadow-lg transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
                   {/* Left info */}
-                  <div 
+                  <div
                     onClick={() => onSelectConnection(conn)}
                     className="flex items-center gap-3.5 cursor-pointer flex-1"
                   >
@@ -467,7 +465,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                         <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                       </div>
                       <p className="text-xs text-slate-500 truncate">{partner.email}</p>
-                      
+
                       {/* Active Categories Pills for this connection */}
                       <div className="flex items-center gap-1.5 flex-wrap mt-2">
                         {activeCats.slice(0, 3).map(cid => (
@@ -537,11 +535,10 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
               <button
                 key={cat.id}
                 onClick={() => setSelectedDailyCat(cat.id)}
-                className={`p-3 rounded-2xl text-center space-y-1.5 transition-all cursor-pointer border ${
-                  isSelected
+                className={`p-3 rounded-2xl text-center space-y-1.5 transition-all cursor-pointer border ${isSelected
                     ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500/50 shadow-md ring-2 ring-indigo-500/20'
                     : 'bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800/80 hover:border-indigo-400/50 shadow-sm'
-                }`}
+                  }`}
               >
                 <div className={`w-9 h-9 mx-auto rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-white text-xs shadow-md`}>
                   {CATEGORY_ICONS[cat.id]}
@@ -562,7 +559,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
       {editingConnForCats && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 animate-scaleIn">
-            
+
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <span className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
@@ -587,11 +584,10 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                     key={cat.id}
                     type="button"
                     onClick={() => toggleModalCat(cat.id)}
-                    className={`p-3 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer ${
-                      isChecked
+                    className={`p-3 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer ${isChecked
                         ? 'bg-indigo-50 dark:bg-indigo-500/15 border-indigo-500/60 shadow-sm'
                         : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/60 opacity-60'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span className={`p-1.5 rounded-lg bg-gradient-to-br ${cat.color} text-white text-xs`}>

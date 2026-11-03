@@ -3,11 +3,18 @@ import { auth } from '../firebase/config';
 import { sendEmailVerification } from 'firebase/auth';
 import { checkVerificationStatus } from '../services/authService';
 
-export const VerifyEmailScreen = ({ onVerified }: { onVerified: () => void }) => {
+export const VerifyEmailScreen = ({
+  user,
+  onVerified,
+  onLogout
+}: {
+  user?: any;
+  onVerified: () => void;
+  onLogout?: () => Promise<void>;
+}) => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  // Comprobación silenciosa cada 4 segundos consultando a Firebase
   useEffect(() => {
     const interval = setInterval(async () => {
       const isVerified = await checkVerificationStatus();
@@ -21,7 +28,7 @@ export const VerifyEmailScreen = ({ onVerified }: { onVerified: () => void }) =>
     if (isVerified) {
       onVerified();
     } else {
-      setError('Firebase indica que el correo aún no está verificado. Revisa tu bandeja de entrada.');
+      setError('Firebase indica que el correo aún no está verificado. Revisa tu bandeja.');
     }
   };
 
@@ -40,13 +47,19 @@ export const VerifyEmailScreen = ({ onVerified }: { onVerified: () => void }) =>
   return (
     <div className="verify-screen">
       <h2>Verifica tu correo</h2>
-      <p>Hemos enviado un enlace de confirmación. No podrás acceder hasta confirmarlo.</p>
+      <p>Hemos enviado un enlace de confirmación a {user?.email || 'tu correo'}.</p>
 
       {error && <p className="error">{error}</p>}
       {message && <p className="success">{message}</p>}
 
       <button onClick={handleManualCheck}>Ya he verificado mi correo</button>
-      <button onClick={handleResend} className="secondary">Reenviar correo de verificación</button>
+      <button onClick={handleResend} className="secondary">Reenviar correo</button>
+
+      {onLogout && (
+        <button onClick={onLogout} className="text-button" style={{ marginTop: '1rem' }}>
+          Cerrar sesión
+        </button>
+      )}
     </div>
   );
 };

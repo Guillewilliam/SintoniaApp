@@ -1,7 +1,7 @@
 import { db, auth } from '../firebase/config';
-import { collection, doc, setDoc, getDoc, runTransaction } from 'firebase/firestore';
+import { collection, doc, setDoc, runTransaction, query, where, onSnapshot, updateDoc, deleteDoc } from 'firebase/firestore';
 
-export const createInviteCode = async () => {
+export const createInviteCode = async (): Promise<string> => {
   const user = auth.currentUser;
   if (!user || !user.emailVerified) throw new Error("Usuario no autenticado o no verificado.");
 
@@ -20,7 +20,7 @@ export const createInviteCode = async () => {
   return code;
 };
 
-export const acceptInviteCode = async (code: string) => {
+export const acceptInviteCode = async (code: string): Promise<string> => {
   const user = auth.currentUser;
   if (!user || !user.emailVerified) throw new Error("Usuario no autenticado o no verificado.");
 
@@ -37,14 +37,12 @@ export const acceptInviteCode = async (code: string) => {
     if (new Date(data.expiresAt) < new Date()) throw new Error("La invitación ha caducado.");
     if (data.creatorUid === user.uid) throw new Error("No puedes usar tu propia invitación.");
 
-    // Marcar invitación como aceptada
     transaction.update(inviteRef, {
       status: 'accepted',
       usedByUid: user.uid,
       connectionId: connectionId
     });
 
-    // Crear la conexión real
     transaction.set(connectionRef, {
       participants: [data.creatorUid, user.uid],
       createdAt: new Date().toISOString(),
@@ -53,4 +51,25 @@ export const acceptInviteCode = async (code: string) => {
   });
 
   return connectionId;
+};
+
+export const subscribeToUserConnections = (userId: string, callback: (connections: any[]) => void) => {
+  const q = query(collection(db, 'connections'), where('participants', 'array-contains', userId));
+  return onSnapshot(q, (snapshot) => {
+    const conns = snapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+    callback(conns);
+  });
+};
+
+export const updateConnectionPreferences = async (connectionId: string, preferences: any) => {
+  const connRef = doc(db, 'connections', connectionId);
+  await updateDoc(connRef, preferences);
+};
+
+export const removeConnection = async (connectionId: string) => {
+  const connRef = doc(db, 'connections', connectionId);
+  await deleteDoc(connRef);
 };

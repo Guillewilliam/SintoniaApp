@@ -35,7 +35,7 @@ export const App: React.FC = () => {
 
   // Subscribe to auth state
   useEffect(() => {
-    const unsubscribe = onAuthProfileChanged((profile) => {
+    const unsubscribe = onAuthProfileChanged((profile: any) => {
       setCurrentUser(profile);
       setAuthInitialized(true);
       if (profile?.preferences?.theme) {
@@ -92,12 +92,12 @@ export const App: React.FC = () => {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
         <OfflineBanner />
-        <Navbar 
-          user={null} 
-          onOpenProfile={() => {}} 
-          onLogout={() => {}} 
-          theme={theme} 
-          onToggleTheme={toggleTheme} 
+        <Navbar
+          user={null}
+          onOpenProfile={() => { }}
+          onLogout={() => { }}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
         <FirebaseStatusBanner />
         <main className="flex-1">
@@ -112,16 +112,16 @@ export const App: React.FC = () => {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
         <OfflineBanner />
-        <Navbar 
-          user={currentUser} 
-          onOpenProfile={() => setShowUserProfile(true)} 
-          onLogout={handleLogout} 
-          theme={theme} 
-          onToggleTheme={toggleTheme} 
+        <Navbar
+          user={currentUser}
+          onOpenProfile={() => setShowUserProfile(true)}
+          onLogout={handleLogout}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
         <main className="flex-1">
-          <VerifyEmailScreen 
-            user={currentUser} 
+          <VerifyEmailScreen
+            user={currentUser}
             onVerified={() => setCurrentUser({ ...currentUser, emailVerified: true })}
             onLogout={handleLogout}
           />
@@ -134,12 +134,12 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white transition-colors duration-200">
       <OfflineBanner />
-      <Navbar 
-        user={currentUser} 
-        onOpenProfile={() => setShowUserProfile(true)} 
-        onLogout={handleLogout} 
-        theme={theme} 
-        onToggleTheme={toggleTheme} 
+      <Navbar
+        user={currentUser}
+        onOpenProfile={() => setShowUserProfile(true)}
+        onLogout={handleLogout}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
       <FirebaseStatusBanner />
 
@@ -180,18 +180,16 @@ export const App: React.FC = () => {
       {/* Global Modals */}
       {showCreateInvite && (
         <CreateInviteModal
-          user={currentUser}
+
           onClose={() => setShowCreateInvite(false)}
         />
       )}
 
       {showEnterCode && (
         <EnterCodeModal
-          user={currentUser}
           onClose={() => setShowEnterCode(false)}
-          onConnectionCreated={(newConn) => {
-            setSelectedConnection(newConn);
-            setCurrentView('session');
+          onSuccess={(newConn: any) => {
+            setShowEnterCode(false);
           }}
         />
       )}
